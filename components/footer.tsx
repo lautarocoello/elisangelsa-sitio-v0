@@ -53,7 +53,7 @@ export default function Footer() {
               <Link href="https://www.facebook.com/elisangelashowbrasil" className="text-gray-400 hover:text-white transition-colors">
                 <Facebook size={24} />
               </Link>
-              <Link href="#https://www.instagram.com/elisangelavieira932" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="https://www.instagram.com/elisangelavieira932" className="text-gray-400 hover:text-white transition-colors">
                 <Instagram size={24} />
               </Link>
               <Link href="https://www.tiktok.com/@elisangelashowbrasil" className="text-gray-400 hover:text-white transition-colors">
