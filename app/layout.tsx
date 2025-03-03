@@ -7,9 +7,10 @@ import { LanguageProvider } from "@/lib/language-context"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Animacion de eventos",
-  description: "Book amazing performances for your events",
-    generator: 'v0.dev'
+  title: "Elisangela Show Brasil",
+  description: "Lleva tus eventos a otros nivel con nuestros shows",
+    generator: 'v0.dev',
+  icons: { rel: "icon", url: "/favicon.png.jpg" },
 }
 
 export default function RootLayout({
