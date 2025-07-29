@@ -7,17 +7,17 @@ import { PlayCircle } from "lucide-react"
 const shows = [
   {
     id: 1,
-    title: "¿Que sera de ti?",
+    title: "CHECHERERE CHECHE",
     videoUrl: "/videos/video1.mp4",
   },
   {
     id: 2,
-    title: "Feria de las Colectividades - Quilmes 2023",
+    title: "DANZA DA MAOZINHA",
     videoUrl: "/videos/video2.mp4",
   },
   {
     id: 3,
-    title: "Perola Negra Brasil",
+    title: "QUE SERA DE TI",
     videoUrl: "/videos/video3.mp4",
   },
 ]
