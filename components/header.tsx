@@ -17,9 +17,44 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm text-white">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold">
-        Elisangela Show Brasil
+        <Link href="/" className="text-center block group">
+          <span
+            className="block text-4xl sm:text-5xl font-lobster text-white animate-text-glow"
+          >
+            ELISÃNGELA
+          </span>
+          <span
+            className="block text-2xl sm:text-3xl font-lobster text-white animate-text-glow delay-200"
+          >
+            SHOW BRASIL
+          </span>
+
+          <style jsx>{`
+    @keyframes textGlow {
+      0% {
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        transform: translateY(0px);
+      }
+      50% {
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+        transform: translateY(-2px);
+      }
+      100% {
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        transform: translateY(0px);
+      }
+    }
+
+    .animate-text-glow {
+      animation: textGlow 3s ease-in-out infinite;
+    }
+
+    .delay-200 {
+      animation-delay: 0.2s;
+    }
+  `}</style>
         </Link>
+
 
         <div className="flex items-center gap-2">
           <LanguageSwitcher />

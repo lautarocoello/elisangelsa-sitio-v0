@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight, MapPin } from "lucide-react"
+import { ChevronLeft, ChevronRight, MapPin, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -14,15 +14,16 @@ import {
   isSameMonth,
   isSameDay,
   isToday,
-  parseISO,
   getDay
 } from "date-fns"
 import { useLanguage } from "@/lib/language-context"
 
 export default function WhereToFindMe() {
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 0, 1)) // Inicia en enero 2025
+  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()))
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [upcomingShows, setUpcomingShows] = useState<{ date: Date; title: string; location: string }[]>([])
+  const [upcomingShows, setUpcomingShows] = useState<
+    { date: Date; title: string; location: string; link?: string }[]
+  >([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const { t } = useLanguage()
@@ -32,16 +33,19 @@ export default function WhereToFindMe() {
       try {
         const response = await fetch("/api/submit-to-sheets")
         const data = await response.json()
-  
+
         if (data.error) {
           setError(true)
         } else {
           setUpcomingShows(
-            data.upcomingShows.map((show: { date: string; title: string; location: string }) => ({
-              date: new Date(show.date), // 🔥 La fecha ya viene en UTC desde la API
-              title: show.title,
-              location: show.location,
-            }))
+            data.upcomingShows.map(
+              (show: { date: string; title: string; location: string; link?: string }) => ({
+                date: new Date(show.date),
+                title: show.title,
+                location: show.location,
+                link: show.link // link opcional que viene de la columna D
+              })
+            )
           )
         }
       } catch (err) {
@@ -50,20 +54,20 @@ export default function WhereToFindMe() {
         setLoading(false)
       }
     }
-  
+
     fetchShows()
   }, [])
-  
 
   const monthStart = startOfMonth(currentMonth)
   const monthEnd = endOfMonth(currentMonth)
   const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
-  const firstDayIndex = getDay(monthStart) // Obtiene el día de la semana (0=Domingo, 3=Miércoles)
+  const firstDayIndex = getDay(monthStart)
 
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1))
 
-  const getShowsForDate = (date: Date) => upcomingShows.filter((show) => isSameDay(show.date, date))
+  const getShowsForDate = (date: Date) =>
+    upcomingShows.filter((show) => isSameDay(show.date, date))
   const showsForSelectedDate = selectedDate ? getShowsForDate(selectedDate) : []
 
   return (
@@ -95,7 +99,6 @@ export default function WhereToFindMe() {
                   </div>
                 ))}
 
-                {/* Espacios vacíos para alinear el primer día del mes */}
                 {Array.from({ length: firstDayIndex }).map((_, i) => (
                   <div key={`empty${i}`} className="min-h-[80px] p-1"></div>
                 ))}
@@ -137,12 +140,26 @@ export default function WhereToFindMe() {
                   </h4>
                   <div className="space-y-2">
                     {showsForSelectedDate.map((show, index) => (
-                      <div key={index} className="bg-gray-50 p-3 rounded-md">
-                        <div className="font-medium">{show.title}</div>
-                        <div className="text-sm text-gray-600 flex items-center mt-1">
-                          <MapPin size={16} className="mr-1" />
-                          {show.location}
+                      <div key={index} className="bg-gray-50 p-3 rounded-md flex justify-between items-center">
+                        <div>
+                          <div className="font-medium">{show.title}</div>
+                          <div className="text-sm text-gray-600 flex items-center mt-1">
+                            <MapPin size={16} className="mr-1" />
+                            {show.location}
+                          </div>
                         </div>
+                        {/* Mostrar link si existe */}
+                        {show.link && (
+                          <a
+                            href={show.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center space-x-1 rounded-md border border-primary px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10"
+                          >
+                            <span>VER EVENTO</span>
+                            <ExternalLink size={16} />
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>
