@@ -10,7 +10,6 @@ import {
   subMonths,
   startOfMonth,
   endOfMonth,
-  parseISO,
   startOfDay,
   eachDayOfInterval,
   isSameMonth,
@@ -30,6 +29,12 @@ export default function WhereToFindMe() {
   const [error, setError] = useState(false)
   const { t } = useLanguage()
 
+  const parseDateFromISOStringAsLocalMidnight = (isoString: string): Date => {
+    const utcDate = new Date(isoString);
+    // Crear una fecha local con año, mes, día (ignora la parte de la hora)
+    return new Date(utcDate.getFullYear(), utcDate.getMonth(), utcDate.getDate());
+  };
+
   useEffect(() => {
     const fetchShows = async () => {
       try {
@@ -42,7 +47,7 @@ export default function WhereToFindMe() {
           setUpcomingShows(
             data.upcomingShows.map(
               (show: { date: string; title: string; location: string; link?: string }) => ({
-                date: new Date(show.date),
+                date: parseDateFromISOStringAsLocalMidnight(show.date),
                 title: show.title,
                 location: show.location,
                 link: show.link // link opcional que viene de la columna D
@@ -68,11 +73,12 @@ export default function WhereToFindMe() {
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1))
 
-const getShowsForDate = (date: Date) =>
+  const getShowsForDate = (date: Date) =>
   upcomingShows.filter((show) =>
     isSameDay(startOfDay(show.date), startOfDay(date))
   )
-  const showsForSelectedDate = selectedDate ? getShowsForDate(selectedDate) : []
+
+const showsForSelectedDate = selectedDate ? getShowsForDate(selectedDate) : []
 
   return (
     <section id="calendar" className="py-20 bg-secondary">
