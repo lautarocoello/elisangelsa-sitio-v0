@@ -10,6 +10,8 @@ import {
   subMonths,
   startOfMonth,
   endOfMonth,
+  parseISO,
+  startOfDay,
   eachDayOfInterval,
   isSameMonth,
   isSameDay,
@@ -66,8 +68,10 @@ export default function WhereToFindMe() {
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1))
 
-  const getShowsForDate = (date: Date) =>
-    upcomingShows.filter((show) => isSameDay(show.date, date))
+const getShowsForDate = (date: Date) =>
+  upcomingShows.filter((show) =>
+    isSameDay(startOfDay(show.date), startOfDay(date))
+  )
   const showsForSelectedDate = selectedDate ? getShowsForDate(selectedDate) : []
 
   return (
