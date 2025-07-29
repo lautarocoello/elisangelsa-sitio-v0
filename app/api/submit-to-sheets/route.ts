@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
     switch (formType) {
       case "request-show":
-        sheetName = "Show Requests";
+        sheetName = 'Show Requests';
         values = [
           [
             new Date().toISOString(),
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         break;
 
       case "collaborate":
-        sheetName = "Collaboration Requests";
+        sheetName = 'Collaboration Requests';
         values = [
           [
             new Date().toISOString(),
@@ -82,11 +82,11 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     const sheets = await initializeGoogleSheets()
-    const sheetName = "Upcoming Shows"
+    const sheetName = 'Upcoming Shows'
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${sheetName}!A:D`, // A: date, B: title, C: location
+      range: `${sheetName}!A:D`, // A: date, B: title, C: location, D: link
     })
 
     const rows = response.data.values
