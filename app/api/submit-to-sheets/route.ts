@@ -5,8 +5,17 @@ import { google } from "googleapis"
 const GOOGLE_SHEETS_PRIVATE_KEY = process.env.GOOGLE_SHEETS_PRIVATE_KEY?.replace(/\\n/g, '\n');
 const GOOGLE_SHEETS_CLIENT_EMAIL = process.env.GOOGLE_SHEETS_CLIENT_EMAIL;
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
+const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY!);
 
 // Inicialización de Google Sheets
+
+const auth = new google.auth.JWT({
+  email: serviceAccount.client_email,
+  key: serviceAccount.private_key,
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+
+
 export const initializeGoogleSheets = async () => {
   const auth = new google.auth.JWT({
     email: GOOGLE_SHEETS_CLIENT_EMAIL,
