@@ -20,6 +20,7 @@ export default function RequestShow() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { t } = useLanguage()
   const { toast } = useToast()
+  const [open, setOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -39,36 +40,26 @@ export default function RequestShow() {
     setIsSubmitting(true)
 
     try {
-      // Send data to Google Sheets via API route
-      const response = await fetch("/api/submit-to-sheets", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          formType: "request-show",
-          data: { ...formData, date: date?.toISOString() },
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to submit form")
+      // Limpieza de saltos de línea en texto largo (opcional)
+      const cleanedFormData = {
+        ...formData,
+        description: formData.description.replace(/\s+/g, " ").trim(),
+        date: date?.toISOString(),
       }
 
-      // Show success message
-      toast({
-        title: t("request.success"),
-        duration: 3000,
+      const jsonBody = JSON.stringify({ formType: "request-show", data: cleanedFormData })
+
+      const response = await fetch("/api/submit-to-sheets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: jsonBody, // ya está en una línea
       })
 
-      // Reset form
-      setFormData({
-        name: "",
-        phone: "",
-        email: "",
-        socialMedia: "",
-        description: "",
-      })
+      if (!response.ok) throw new Error("Failed to submit form")
+
+      toast({ title: t("request.success"), duration: 3000 })
+
+      setFormData({ name: "", phone: "", email: "", socialMedia: "", description: "" })
       setDate(undefined)
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -91,72 +82,34 @@ export default function RequestShow() {
         <div className="max-w-2xl mx-auto bg-white/10 backdrop-blur-sm rounded-lg p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="name" className="text-white">
-                  {t("request.name")}
-                </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder={t("request.name")}
-                  required
-                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="phone" className="text-white">
-                  {t("request.phone")}
-                </Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder={t("request.phone")}
-                  required
-                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="email" className="text-white">
-                  {t("request.email")}
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={t("request.email")}
-                  required
-                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="socialMedia" className="text-white">
-                  {t("request.socialMedia")}
-                </Label>
-                <Input
-                  id="socialMedia"
-                  name="socialMedia"
-                  value={formData.socialMedia}
-                  onChange={handleChange}
-                  placeholder="Instagram, TikTok, etc."
-                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50"
-                />
-              </div>
+              {[
+                { id: "name", type: "text" },
+                { id: "phone", type: "tel" },
+                { id: "email", type: "email" },
+                { id: "socialMedia", type: "text", placeholder: "Instagram, TikTok, etc." },
+              ].map(({ id, type, placeholder }) => (
+                <div key={id}>
+                  <Label htmlFor={id} className="text-white">
+                    {t(`request.${id}`)}
+                  </Label>
+                  <Input
+                    id={id}
+                    name={id}
+                    type={type}
+                    value={formData[id as keyof typeof formData]}
+                    onChange={handleChange}
+                    placeholder={placeholder || t(`request.${id}`)}
+                    required={id !== "socialMedia"}
+                    className="bg-white/20 border-white/30 text-white placeholder:text-white/50"
+                  />
+                </div>
+              ))}
 
               <div>
                 <Label htmlFor="date" className="text-white">
                   {t("request.date")}
                 </Label>
-                <Popover>
+                <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -170,9 +123,18 @@ export default function RequestShow() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
-                    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={(selectedDate) => {
+                        setDate(selectedDate);
+                        setOpen(false); // <- cierra el calendario
+                      }}
+                      initialFocus
+                    />
                   </PopoverContent>
                 </Popover>
+
               </div>
 
               <div>
@@ -201,4 +163,3 @@ export default function RequestShow() {
     </section>
   )
 }
-
